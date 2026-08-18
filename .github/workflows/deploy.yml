@@ -18,11 +18,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
+      # enablement turns Pages on via the API when it has never been enabled,
+      # which is what the deploy step's 404 means.
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - run: npm ci
       # base must match the repo name so asset URLs resolve under /<repo>/.
       - run: npm run build
