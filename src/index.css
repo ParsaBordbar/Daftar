@@ -1,0 +1,204 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-ui: 'Vazirmatn', Tahoma, system-ui, sans-serif;
+  --font-mark: 'Playfair Display', Georgia, serif;
+
+  --color-paper: #f9f5ef;
+  --color-paper-2: #f2ece4;
+  --color-ink: #2e1f14;
+  --color-ink-2: #7d6449;
+  --color-tan: #b07d62;
+  --color-gold: #c8a24a;
+  --color-shangarf: #b33a2b;
+  --color-line: #ddd0bb;
+
+  --color-night: #171a22;
+  --color-night-2: #1e222c;
+  --color-night-ink: #ece5d8;
+  --color-night-ink-2: #97907f;
+  --color-night-line: #2e3340;
+
+  --ease-page: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: var(--color-night);
+    color: var(--color-night-ink);
+  }
+}
+
+@utility jadval {
+  border: 1px solid var(--jadval-edge);
+  box-shadow:
+    inset 0 0 0 3px color-mix(in oklab, var(--color-gold) 12%, transparent),
+    inset 0 0 0 4px var(--jadval-inner);
+}
+
+:root {
+  --jadval-edge: color-mix(in oklab, #ddd0bb 80%, transparent);
+  --jadval-inner: color-mix(in oklab, #ddd0bb 45%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --jadval-edge: #2e3340;
+    --jadval-inner: color-mix(in oklab, #2e3340 70%, transparent);
+  }
+}
+
+[dir='ltr'] {
+  unicode-bidi: isolate;
+}
+
+input[type='range'] {
+  direction: ltr;
+  accent-color: var(--color-tan);
+  height: 22px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-tan);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--color-tan) 40%, transparent);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- motion ----------
+   Chrome only. PoemPage is the html-to-image capture node and stays static,
+   so an export can never catch a frame mid-animation. */
+
+@keyframes daftar-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes daftar-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes daftar-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.965);
+  }
+}
+
+@keyframes daftar-toast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes daftar-sheet {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.99);
+  }
+}
+
+@keyframes daftar-breathe {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@utility anim-rise {
+  animation: daftar-rise 0.42s var(--ease-page) both;
+  animation-delay: var(--anim-delay, 0ms);
+}
+
+@utility anim-fade {
+  animation: daftar-fade 0.3s var(--ease-page) both;
+  animation-delay: var(--anim-delay, 0ms);
+}
+
+@utility anim-pop {
+  animation: daftar-pop 0.34s var(--ease-page) both;
+  animation-delay: var(--anim-delay, 0ms);
+}
+
+@utility anim-toast {
+  animation: daftar-toast 0.3s var(--ease-page) both;
+}
+
+@utility anim-sheet {
+  animation: daftar-sheet 0.34s var(--ease-page) both;
+}
+
+@utility anim-breathe {
+  animation: daftar-breathe 1.4s ease-in-out infinite;
+}
+
+/* prefers-reduced-motion is neutralised globally above; also drop the offsets
+   so nothing lands translated when animations are clamped to 0.01ms. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes daftar-rise {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes daftar-pop {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes daftar-sheet {
+    from {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
