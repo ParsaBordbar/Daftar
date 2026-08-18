@@ -190,7 +190,7 @@ export default function App() {
             <span className="flex min-w-0 flex-col leading-tight">
               <span className="truncate text-[12px]">{BRAND.faTagline}</span>
 
-              <span className="text-[9.5px] tracking-[0.16em] text-tan">{BRAND.faKicker}</span>
+              {/* <span className="text-[9.5px] tracking-[0.16em] text-tan">{BRAND.faKicker}</span> */}
 
             </span>
 

@@ -7,7 +7,7 @@ export const BRAND = {
 
   mark: 'the-booklet.app',
   faTagline: 'دفتر پارسی',
-  faKicker: 'نسخهٔ رایگان',
+  // faKicker: 'نسخهٔ رایگان',
   faSoon: 'به‌زودی',
   faPitch:
     'این صفحه‌ساز، نمونهٔ رایگان و بی‌سرور از The Booklet است — همان حال‌وهوای کتاب، این‌بار با قلم‌های پارسی.',
