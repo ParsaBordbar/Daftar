@@ -1,4 +1,5 @@
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
+import { DEFAULT_FONT, FONT_BY_ID } from './fonts'
 import { INITIAL, type PoemState } from './poem'
 
 const KEYS: Record<keyof PoemState, string> = {
@@ -48,6 +49,9 @@ export function decodeState(token: string): PoemState | null {
         ;(out as unknown as Record<string, unknown>)[key] = value
       }
     }
+
+    if (!FONT_BY_ID.has(out.fontId)) out.fontId = DEFAULT_FONT
+
     return out
   } catch {
     return null
