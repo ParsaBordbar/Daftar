@@ -1,5 +1,7 @@
 # The Booklet · دفتر — Persian poem page maker
 
+**English** · [فارسی](FA-README.md)
+
 A free, no-backend demo of [The Booklet](https://the-booklet.app) for Persian
 poetry and prose. Paste or type a poem, pick a Persian typeface and a paper,
 and export a clean book page as a high-resolution PNG sized for wherever you
@@ -124,3 +126,28 @@ redundant stylesheet walk on every export.
 The page itself is always in the DOM at its true logical size (1080×1920 and
 so on) and shrunk with a CSS transform for preview, so the export is a
 pixel-exact capture rather than a re-render.
+
+## License
+
+The code is [MIT](LICENSE). Use it, fork it, change it, ship it commercially —
+no permission needed and no fee. The only condition MIT imposes is that the
+copyright line and the license text stay with the source.
+
+Beyond that, a name-drop is plenty. Something like "based on
+[Daftar](https://github.com/ParsaBordbar/Daftar)" in your README, About page,
+or footer is exactly the kind of credit this is hoping for. It is a request,
+not a requirement — MIT is the license, and nothing here adds a condition on
+top of it.
+
+MIT covers this repository's own code and content. It does not relicense
+things that arrive under their own terms:
+
+- **Bundled fonts** — Mikhak is SIL OFL 1.1 and Tanha is under the Bitstream
+  Vera Fonts License. Both require their notice to travel with the font, so
+  keep `public/fonts/Mikhak-OFL.txt` and `public/fonts/Tanha-LICENSE.txt` in
+  any fork or build. See [`public/fonts/README.md`](public/fonts/README.md).
+- **Google-hosted fonts** — SIL OFL 1.1, fetched at runtime, never
+  redistributed by this repository.
+- **Poems** — the Ganjoor corpus, read from the CDN at runtime. The texts are
+  classical and long out of copyright, but `ganjoor-data` itself declares no
+  license; see "Where the poems come from" above before vendoring a copy.
