@@ -1,153 +1,206 @@
-# The Booklet · دفتر — Persian poem page maker
+<div align="center">
 
-**English** · [فارسی](FA-README.md)
+# دفتر · Daftar
 
-A free, no-backend demo of [The Booklet](https://the-booklet.app) for Persian
-poetry and prose. Paste or type a poem, pick a Persian typeface and a paper,
-and export a clean book page as a high-resolution PNG sized for wherever you
-are posting it.
+**A Persian poem page maker that runs entirely in your browser.**
 
-Everything runs in the browser. There is no server and no account, and the poem
-text never leaves the page. The one exception is Ganjoor full-text search: the
-term you type is sent to Ganjoor's public API to find matching poems. Browsing
-and reading poems still comes straight from the public `ganjoor-data` snapshot
-on jsDelivr.
+[**▶ Open the app**](https://parsabordbar.github.io/Daftar/) · [Report a bug](https://github.com/ParsaBordbar/Daftar/issues) · [فارسی](FA-README.md)
 
-## What it does
+[![Deploy](https://github.com/ParsaBordbar/Daftar/actions/workflows/deploy.yml/badge.svg)](https://github.com/ParsaBordbar/Daftar/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![React 19](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)](https://vite.dev)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![No backend](https://img.shields.io/badge/backend-none-brightgreen)](#privacy-what-leaves-your-browser)
+[![Poems: Ganjoor](https://img.shields.io/badge/poems-Ganjoor-8b5e34)](https://ganjoor.net)
 
-- **The whole Persian canon, built in.** Browse [Ganjoor](https://ganjoor.net)
-  — 234 poets, ~132,000 poems — pick a poem, trim it to the beits you want,
-  and drop it onto the page with the title, poet, and source filled in. The
-  body type resizes itself to fit what you chose.
-- **Full-text search.** Type a hemistich you half-remember and get the poems
-  that contain it, scoped to the poet you are browsing or across all of
-  Ganjoor. Matches are highlighted in the result snippet.
-- **18 Persian typefaces** across four groups — nastaliq (نستعلیق), naskh
-  (نسخ), sans (بی‌سریف), and decorative (تزئینی). All are free and openly
-  licensed. Fonts load on demand, so a visit costs one font, not eighteen.
-- **8 paper themes** — aged paper, night, lapis, turquoise, saffron, white,
-  pomegranate, charcoal — each with its own ink, accent, and gilt colours.
-- **Three verse layouts** — single hemistich per line, paired hemistichs for
-  the classical beit (بیت), and ragged-right for free verse (شعر نو).
-- **Manuscript ornament** — divider, double frame, corner pieces, or a شمسه
-  rosette.
-- **13 export sizes** — Instagram story / square / portrait, Pinterest,
-  LinkedIn, X, Telegram, WhatsApp, A4 and A5 at 300 dpi, phone and desktop
-  wallpapers — each at 1×, 2×, or 3×.
-- **Share links** that carry the whole page in the URL fragment. Nothing is
-  stored anywhere; the recipient opens the link and gets your exact page,
-  editable.
-- **Anonymous counter** of how many pages have been made. It records a bare
-  increment and nothing else.
+<p>
+  <img src="docs/page-kaghaz.png"  width="30%" alt="Rumi's ney-nameh on aged paper in Noto Nastaliq" />
+  <img src="docs/page-shab.png"    width="30%" alt="The same poem on the night paper in Amiri naskh" />
+  <img src="docs/page-zaferan.png" width="30%" alt="The same poem on saffron paper in Gulzar nastaliq" />
+</p>
 
-## Where the poems come from
+<sub>Rumi's نی‌نامه, exported at Instagram-story size — aged paper / نستعلیق · night / نسخ · saffron / گلزار</sub>
 
-[`ganjoor/ganjoor-data`](https://github.com/ganjoor/ganjoor-data) publishes the
-Ganjoor corpus as plain JSON served over jsDelivr with CORS open, so the app
-reads it directly from the CDN and still has no backend of its own.
+</div>
 
-`src/lib/ganjoor.ts` fetches three file kinds — `manifest.json` for the poet
-list, `_cat.json` for a book or chapter, and one file per poem — and caches
-each in memory and `sessionStorage`. Ganjoor stores a beit as two verses
-sharing a `CoupletIndex`, tagged `Right` (first hemistich) and `Left`;
-`toCouplets` maps that onto the page's own stanza model and drops editorial
-`Comment` verses.
+---
 
-By default this tracks `@main`. To pin a frozen snapshot, set
-`VITE_GANJOOR_REF` to a commit SHA.
+## What this is
 
-Note: the `ganjoor-data` repository does not declare a license. The poems
-themselves are classical and long out of copyright, and this app reads the
-data at runtime rather than redistributing it, but if you plan to vendor a
-copy into your own repo, settle that with the Ganjoor maintainers first.
+Type or paste a Persian poem — or pull one straight out of the [Ganjoor](https://ganjoor.net) corpus — pick a
+typeface and a paper, and export a finished book page as a high-resolution PNG sized for wherever you're posting it.
 
-## Run it
+There is no server, no account, and no build step between you and the image. The whole app is a static bundle on
+GitHub Pages.
+
+> **Try it now → <https://parsabordbar.github.io/Daftar/>**
+
+## Feature tour
+
+### The Persian canon, built in
+
+Browse Ganjoor's ~234 poets and ~132,000 poems in-app, pick one, trim it to the beits you want, and drop it onto
+the page with title, poet, and source filled in. Body type auto-fits whatever you selected.
+
+Half-remember a hemistich? Full-text search finds the poems containing it, scoped either to the poet you're
+browsing or across all of Ganjoor, with matches highlighted in the snippet.
+
+### 18 Persian typefaces
+
+Four groups — نستعلیق (nastaliq), نسخ (naskh), بی‌سریف (sans), تزئینی (decorative). Every face is free and openly
+licensed, and each was checked for the Persian letters پ چ ژ گ ک ی before being added. Fonts load on demand, so a
+visit downloads one face, not eighteen.
+
+### 8 paper themes
+
+`کاغذ` aged paper · `شب` night · `لاجورد` lapis · `فیروزه` turquoise · `زعفران` saffron · `سپید` white ·
+`انار` pomegranate · `زغال` charcoal — each with its own ink, accent, and gilt colours.
+
+### Layout and ornament
+
+Three verse layouts: one hemistich per line, paired hemistichs for the classical بیت, and ragged-right for
+free verse (شعر نو). Manuscript ornaments: divider, double frame, corner pieces, or a شمسه rosette.
+
+### 13 export sizes, at 1× / 2× / 3×
+
+| Preset | 1× pixels | Preset | 1× pixels |
+| --- | --- | --- | --- |
+| Instagram story | 1080 × 1920 | Telegram | 1280 × 1600 |
+| Instagram square | 1080 × 1080 | A4 print | 1240 × 1754 |
+| Instagram portrait | 1080 × 1350 | A5 print | 874 × 1240 |
+| Pinterest | 1000 × 1500 | Phone wallpaper | 1440 × 3120 |
+| Pinterest long | 1000 × 2100 | Desktop wallpaper | 2560 × 1440 |
+| LinkedIn | 1200 × 628 | | |
+| LinkedIn square | 1200 × 1200 | | |
+| X / Twitter | 1600 × 900 | | |
+
+The A4 and A5 presets are 150 dpi at 1×, so export them at **2× for a true 300 dpi print file**
+(2480 × 3508 and 1748 × 2480).
+
+### Share links that carry the whole page
+
+The full page state is LZ-compressed into the URL fragment. Nothing is stored anywhere — the recipient opens the
+link and gets your exact page, still editable.
+
+## Privacy: what leaves your browser
+
+| | Leaves your machine? |
+| --- | --- |
+| Your poem text, title, layout, and the exported PNG | **No.** Rendered and encoded locally; export never uploads. |
+| Share links | **No.** The state lives in the URL fragment, which browsers never send to a server. |
+| Browsing / reading Ganjoor poems | Yes — plain file reads from the `ganjoor-data` snapshot on jsDelivr. |
+| Ganjoor full-text search | Yes — your search term is sent to Ganjoor's public API (`api.ganjoor.net`). |
+| Page counter | A bare increment to a public counter service. No content, no identifiers. |
+
+## Run it locally
 
 ```bash
+git clone https://github.com/ParsaBordbar/Daftar.git
+cd Daftar
 npm install
 npm run dev
 ```
 
-## Deploy to GitHub Pages
+| Script | Does |
+| --- | --- |
+| `npm run dev` | Vite dev server with HMR |
+| `npm run build` | Type-check (`tsc -b`) then build to `dist/` |
+| `npm run preview` | Serve the production build locally |
+| `npm run lint` | [oxlint](https://oxc.rs) |
+| `npm run deploy` | Build and push `dist/` to `gh-pages` from your machine |
 
-Push to `main` and `.github/workflows/deploy.yml` builds and publishes, setting
-the Vite `base` from the repository name automatically. Enable Pages with
-**Settings → Pages → Source: GitHub Actions** once.
+## Deploy
 
-To publish from your machine instead:
+Pushing to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which builds with
+`VITE_BASE=/<repo-name>/`, copies `index.html` to `404.html` so deep links survive, and publishes to Pages.
+Enable it once under **Settings → Pages → Source: GitHub Actions**.
+
+To publish from your machine instead, set `VITE_BASE` explicitly — the default in `vite.config.ts` is
+lowercase `/daftar/` and GitHub Pages paths are case-sensitive:
 
 ```bash
-VITE_BASE=/<repo-name>/ npm run deploy
+VITE_BASE=/Daftar/ npm run deploy
 ```
 
-## Font licensing
+## How it works
 
-Every typeface in the picker is free to use and openly licensed. Sixteen of
-the eighteen are SIL OFL 1.1 and are fetched from Google Fonts at runtime, so
-this repository does not redistribute them; each was verified to carry the
-Persian letters پ چ ژ گ ک ی before being added.
+### Where the poems come from
 
-Two are bundled in [`public/fonts/`](public/fonts/README.md): **Mikhak**
-(SIL OFL 1.1) and **Tanha** (Bitstream Vera Fonts License, with the author's
-changes in the public domain). Both licenses require their notice to ship
-alongside the font, so `Mikhak-OFL.txt` and `Tanha-LICENSE.txt` must stay in
-that directory.
+[`ganjoor/ganjoor-data`](https://github.com/ganjoor/ganjoor-data) publishes the Ganjoor corpus as plain JSON over
+jsDelivr with CORS open, so the app reads it straight from the CDN and still has no backend.
 
-Ten previously bundled families were removed because they asserted copyright
-without granting a license, or reserved all rights outright — see the
-"Removed" section of `public/fonts/README.md` for the list and why. The picker
-is generated from the `FONTS` array in `src/lib/fonts.ts`, so adding or
-dropping a face is a one-file change.
+`src/lib/ganjoor.ts` fetches three file kinds — `manifest.json` for the poet list, `_cat.json` for a book or
+chapter, and one file per poem — caching each in memory and `sessionStorage`. Ganjoor stores a beit as two verses
+sharing a `CoupletIndex`, tagged `Right` (first hemistich) and `Left`; `toCouplets` maps that onto the page's
+stanza model and drops editorial `Comment` verses.
 
-## Configuration
+The snapshot tracks `@main` by default. Pin a frozen revision with `VITE_GANJOOR_REF=<commit-sha>`.
+
+> The `ganjoor-data` repository declares no license. The poems are classical and long out of copyright, and this
+> app reads the data at runtime rather than redistributing it — but settle terms with the Ganjoor maintainers
+> before vendoring a copy into your own repo.
+
+### Why the export matches the preview
+
+`html-to-image` can only inline fonts it can read, and it cannot read rules out of a cross-origin stylesheet. So
+every face — bundled or Google-hosted — is fetched, base64-encoded, and injected as a data-URL `@font-face` at
+runtime (`src/lib/fonts.ts`). That CSS is handed to `html-to-image` as `fontEmbedCSS`, which both guarantees the
+PNG matches the preview and skips a redundant stylesheet walk on every export.
+
+The page also lives in the DOM at its true logical size (1080 × 1920 and so on) and is shrunk with a CSS transform
+only for preview — so the export is a pixel-exact capture, not a re-render at a different size.
+
+### Configuration
 
 | What | Where |
 | --- | --- |
-| Product name, URL, watermark text, Persian copy | `src/lib/brand.ts` |
+| Product name, URL, watermark, Persian copy | `src/lib/brand.ts` |
 | Font roster | `src/lib/fonts.ts` |
 | Paper themes | `src/lib/themes.ts` |
 | Export sizes | `src/lib/formats.ts` |
 | Counter endpoint | `src/lib/counter.ts`, or `VITE_COUNTER_NS` / `VITE_COUNTER_KEY` |
 | Ganjoor data revision | `VITE_GANJOOR_REF` (default `main`) |
+| Pages base path | `VITE_BASE` (default `/daftar/`) |
 
-The counter defaults to a free public service. If it is unreachable, blocked,
-or rate-limited, the app falls back to a local-only count and keeps working —
-so swapping it out is a one-file change with no other consequences.
+The counter defaults to a free public service. If it's unreachable, blocked, or rate-limited, the app falls back
+to a local-only count and keeps working — so swapping it out is a one-file change with no other consequences.
 
-## How the export stays honest
+## Font licensing
 
-`html-to-image` can only inline fonts it is able to read, and it cannot read
-rules out of a cross-origin stylesheet. So every face — bundled or from Google
-— is fetched, base64-encoded, and injected as a data-URL `@font-face` at
-runtime (`src/lib/fonts.ts`). That CSS is then handed to `html-to-image` as
-`fontEmbedCSS`, which both guarantees the PNG matches the preview and skips a
-redundant stylesheet walk on every export.
+All 18 pickable faces are free and openly licensed. Sixteen are SIL OFL 1.1 fetched from Google Fonts at runtime,
+so this repository does not redistribute them.
 
-The page itself is always in the DOM at its true logical size (1080×1920 and
-so on) and shrunk with a CSS transform for preview, so the export is a
-pixel-exact capture rather than a re-render.
+Two are bundled in [`public/fonts/`](public/fonts/README.md): **Mikhak** (SIL OFL 1.1) and **Tanha** (Bitstream
+Vera Fonts License, author's changes in the public domain). Both licenses require their notice to ship alongside
+the font, so `Mikhak-OFL.txt` and `Tanha-LICENSE.txt` must stay in that directory.
+
+Ten previously bundled families were removed for asserting copyright without granting a license, or reserving all
+rights outright — see the "Removed" section of `public/fonts/README.md`. The picker is generated from the `FONTS`
+array in `src/lib/fonts.ts`, so adding or dropping a face is a one-file change.
 
 ## License
 
-The code is [MIT](LICENSE). Use it, fork it, change it, ship it commercially —
-no permission needed and no fee. The only condition MIT imposes is that the
-copyright line and the license text stay with the source.
+The code is [MIT](LICENSE). Use it, fork it, change it, ship it commercially — no permission needed, no fee. MIT's
+only condition is that the copyright line and license text stay with the source.
 
-Beyond that, a name-drop is plenty. Something like "based on
-[Daftar](https://github.com/ParsaBordbar/Daftar)" in your README, About page,
-or footer is exactly the kind of credit this is hoping for. It is a request,
-not a requirement — MIT is the license, and nothing here adds a condition on
-top of it.
+Beyond that, a name-drop is plenty. Something like "based on [Daftar](https://github.com/ParsaBordbar/Daftar)" in
+your README, About page, or footer is exactly the credit this is hoping for. A request, not a requirement.
 
-MIT covers this repository's own code and content. It does not relicense
-things that arrive under their own terms:
+MIT covers this repository's own code and content. It does not relicense things that arrive under their own terms:
 
-- **Bundled fonts** — Mikhak is SIL OFL 1.1 and Tanha is under the Bitstream
-  Vera Fonts License. Both require their notice to travel with the font, so
-  keep `public/fonts/Mikhak-OFL.txt` and `public/fonts/Tanha-LICENSE.txt` in
-  any fork or build. See [`public/fonts/README.md`](public/fonts/README.md).
-- **Google-hosted fonts** — SIL OFL 1.1, fetched at runtime, never
-  redistributed by this repository.
-- **Poems** — the Ganjoor corpus, read from the CDN at runtime. The texts are
-  classical and long out of copyright, but `ganjoor-data` itself declares no
-  license; see "Where the poems come from" above before vendoring a copy.
+- **Bundled fonts** — Mikhak (SIL OFL 1.1) and Tanha (Bitstream Vera Fonts License). Keep
+  `public/fonts/Mikhak-OFL.txt` and `public/fonts/Tanha-LICENSE.txt` in any fork or build. See
+  [`public/fonts/README.md`](public/fonts/README.md).
+- **Google-hosted fonts** — SIL OFL 1.1, fetched at runtime, never redistributed here.
+- **Poems** — the Ganjoor corpus, read from the CDN at runtime. The texts are classical and out of copyright, but
+  `ganjoor-data` itself declares no license; see [Where the poems come from](#where-the-poems-come-from).
+
+---
+
+<div align="center">
+
+Built by [Parsa Bordbar](https://github.com/ParsaBordbar) · Poems by [Ganjoor](https://ganjoor.net)
+
+</div>
