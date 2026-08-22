@@ -10,7 +10,7 @@ import { encodeState, readHash, shareUrl } from './lib/share'
 import { copyPng, exportPng, sharePng } from './lib/export'
 import { bumpCounter, readCounter, type CounterState } from './lib/counter'
 import { BRAND } from './lib/brand'
-import { Ltr, SoonTag, Wordmark } from './components/Wordmark'
+import { Ltr, Mark, SoonTag, Wordmark } from './components/Wordmark'
 
 const DRAFT_KEY = 'daftar:draft'
 
@@ -185,7 +185,8 @@ export default function App() {
       <header className="anim-fade z-30 flex shrink-0 items-center justify-between gap-2 border-b border-line/50 bg-paper/90 px-3 py-2.5 backdrop-blur-md sm:px-4 dark:border-night-line dark:bg-night/90">
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="flex min-w-0 items-center gap-2.5">
-            <Wordmark className="text-[17px] leading-none sm:text-[19px]" />
+            <Mark className="h-8 w-8 sm:h-9 sm:w-9" />
+            <Wordmark className="h-7 sm:h-8" />
             <span className="h-4 w-px shrink-0 bg-line dark:bg-night-line" />
             <span className="flex min-w-0 flex-col leading-tight">
               <span className="truncate text-[12px]">{BRAND.faTagline}</span>
@@ -278,7 +279,7 @@ export default function App() {
               style={{ '--anim-delay': '280ms' } as React.CSSProperties}
             >
               <div className="flex items-center gap-2">
-                <Wordmark className="text-[15px]" />
+                <Wordmark className="h-10" />
                 <SoonTag />
               </div>
 

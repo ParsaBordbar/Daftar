@@ -6,6 +6,8 @@ export const BRAND = {
   comingSoon: true,
 
   mark: 'the-booklet.app',
+
+  logoAlt: 'Daftar! · دفتر',
   faTagline: 'دفتر پارسی',
   // faKicker: 'نسخهٔ رایگان',
   faSoon: 'به‌زودی',

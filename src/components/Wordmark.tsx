@@ -1,6 +1,8 @@
 import { BRAND } from '../lib/brand'
 import { toFa } from '../lib/poem'
 
+const asset = (path: string) => `${import.meta.env.BASE_URL}${path}`
+
 export function Ltr({
   children,
   className,
@@ -23,12 +25,44 @@ export function Dim({ w, h }: { w: number; h: number }) {
   )
 }
 
-export function Wordmark({ className }: { className?: string }) {
+export function Mark({ className }: { className?: string }) {
   return (
-    <Ltr className={`font-mark whitespace-nowrap ${className ?? ''}`}>
-      The <em className="text-tan not-italic italic">Booklet</em>
+    <img
+      src={asset('brand/daftar-mark-128.png')}
+      srcSet={`${asset('brand/daftar-mark-128.png')} 128w, ${asset('brand/daftar-mark-256.png')} 256w, ${asset('brand/daftar-mark.png')} 1024w`}
+      sizes="36px"
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+      className={`shrink-0 select-none object-contain ${className ?? ''}`}
+    />
 
-    </Ltr>
+  )
+}
+
+export function Wordmark({ className, full = false }: { className?: string; full?: boolean }) {
+  const file = full ? 'daftar-logo' : 'daftar-wordmark'
+  return (
+    <span
+      role="img"
+      aria-label={BRAND.logoAlt}
+      className={`inline-flex shrink-0 items-center ${className ?? ''}`}
+    >
+      <img
+        src={asset(`brand/${file}.png`)}
+        alt=""
+        draggable={false}
+        className="h-full w-auto select-none object-contain dark:hidden"
+      />
+
+      <img
+        src={asset(`brand/${file}-light.png`)}
+        alt=""
+        draggable={false}
+        className="hidden h-full w-auto select-none object-contain dark:block"
+      />
+
+    </span>
 
   )
 }
