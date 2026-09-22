@@ -1,46 +1,100 @@
+import { useState, type ReactNode } from 'react'
 import { FONTS, STYLE_LABELS, type FontStyle } from '../lib/fonts'
+import { readImage } from '../lib/image'
+import { keysOf } from '../lib/shortcuts'
 import { THEMES } from '../lib/themes'
 import { FORMAT_BY_ID, SCALES } from '../lib/formats'
 import FormatPicker from './FormatPicker'
+import OrnamentPicker from './OrnamentPicker'
 import { Dim } from './Wordmark'
 import {
   LAYOUT_LABELS,
   ORNAMENT_LABELS,
   toFa,
   type Layout,
-  type Ornament,
   type PoemState,
 } from '../lib/poem'
-import { Button, Chips, Field, Section, Slider, TextArea, TextInput, Toggle } from './ui'
+import { Button, Chips, Field, Slider, TextArea, TextInput, Toggle } from './ui'
+import {
+  ColumnIcon,
+  CuneiformIcon,
+  DiceIcon,
+  ImageIcon,
+  KongrehIcon,
+  BotehIcon,
+  QuillIcon,
+  ScrollIcon,
+  TabletIcon,
+  WingIcon,
+} from './Icons'
 
 type Patch = (p: Partial<PoemState>) => void
 
 const STYLE_ORDER: FontStyle[] = ['nastaliq', 'naskh', 'sans', 'display']
 
-export default function Controls({
-  state,
-  patch,
-  onBrowse,
-  onAutoFit,
-  scale,
-  setScale,
-}: {
+export interface ControlsProps {
   state: PoemState
   patch: Patch
   scale: number
   setScale: (s: number) => void
   onBrowse: () => void
+  onRandom: () => void
   onAutoFit: () => void
-}) {
+  busy?: boolean
+}
+
+export interface ControlSection {
+  id: string
+  title: string
+
+  dock: string
+  icon: ReactNode
+  hint?: ReactNode
+  content: ReactNode
+}
+
+export function useControlSections({
+  state,
+  patch,
+  onBrowse,
+  onRandom,
+  onAutoFit,
+  scale,
+  setScale,
+  busy,
+}: ControlsProps): ControlSection[] {
   const fmt = FORMAT_BY_ID.get(state.formatId)!
-  return (
-    <div className="flex flex-col gap-3">
-      <Section title="متن" hint="خط خالی = بند تازه" delay={0}>
+  const [imgError, setImgError] = useState<string | null>(null)
+
+  const pickImage = async (file: File | undefined) => {
+    if (!file) return
+    setImgError(null)
+    try {
+      patch({ bgImage: await readImage(file) })
+    } catch {
+      setImgError('این فایل به‌عنوان تصویر خوانده نشد.')
+    }
+  }
+  const sections: ControlSection[] = [
+    {
+      id: 'text',
+      dock: 'متن',
+      title: 'متن',
+      icon: <TabletIcon />,
+      hint: 'خط خالی = بند تازه',
+      content: (
+        <>
         <div className="flex flex-col gap-3">
-          <Button onClick={onBrowse}>
-            <span className="h-[6px] w-[6px] rounded-full bg-gold" aria-hidden />
-            انتخاب از گنجور
-          </Button>
+          <div className="grid grid-cols-[1fr_auto] gap-2">
+            <Button onClick={onBrowse} className="tip" data-tip={keysOf('ganjoor')}>
+              <WingIcon className="[--icon-line:#513423] dark:[--icon-line:#e0c98a]" />
+              انتخاب از گنجور
+            </Button>
+            <Button onClick={onRandom} disabled={busy} title="یک شعر تصادفی از گنجور روی صفحه بگذار">
+              <DiceIcon className="[--icon-line:#513423] dark:[--icon-line:#e0c98a]" />
+              {busy ? '…' : 'شانسی'}
+            </Button>
+          </div>
 
           <TextArea
             rows={9}
@@ -73,9 +127,17 @@ export default function Controls({
 
         </div>
 
-      </Section>
-
-      <Section title="قلم" hint={`${toFa(FONTS.length)} قلم`} delay={40}>
+        </>
+      ),
+    },
+    {
+      id: 'font',
+      dock: 'قلم',
+      title: 'قلم',
+      icon: <QuillIcon />,
+      hint: `${toFa(FONTS.length)} قلم`,
+      content: (
+        <>
         <div className="flex flex-col gap-3">
           {STYLE_ORDER.map((style) => {
             const group = FONTS.filter((f) => f.style === style)
@@ -118,9 +180,16 @@ export default function Controls({
           })}
         </div>
 
-      </Section>
-
-      <Section title="رنگ و کاغذ" delay={80}>
+        </>
+      ),
+    },
+    {
+      id: 'paper',
+      dock: 'کاغذ',
+      title: 'رنگ و کاغذ',
+      icon: <BotehIcon />,
+      content: (
+        <>
         <div className="grid grid-cols-4 gap-2">
           {THEMES.map((t) => {
             const active = t.id === state.themeId
@@ -152,9 +221,121 @@ export default function Controls({
           })}
         </div>
 
-      </Section>
+        <div className="mt-3 flex flex-col gap-2.5">
+          <div className="grid grid-cols-[1fr_auto] gap-2">
+            <label
+              className="inline-flex min-h-[42px] cursor-pointer items-center justify-center gap-2 rounded-xl border border-line/70 px-3.5 py-2.5 text-[13px] font-medium text-ink transition-[background-color,border-color,transform] duration-200 ease-page hover:-translate-y-px hover:border-tan hover:bg-tan/10 active:translate-y-0 active:scale-[0.98] dark:border-night-line dark:text-night-ink"
+              title="تصویر پس‌زمینه — یا فایل را روی صفحه بکشید"
+            >
+              <ImageIcon className="[--icon-line:#513423] dark:[--icon-line:#e0c98a]" />
+              {state.bgImage ? 'تعویض تصویر' : 'تصویر پس‌زمینه'}
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={(e) => {
+                  void pickImage(e.target.files?.[0])
+                  e.target.value = ''
+                }}
+              />
+            </label>
+            {state.bgImage && (
+              <Button onClick={() => patch({ bgImage: '' })} title="حذف تصویر">
+                حذف
+              </Button>
+            )}
+          </div>
 
-      <Section title="اندازه خروجی" hint={<Dim w={fmt.w} h={fmt.h} />} delay={120}>
+          {imgError && <p className="text-[11px] text-shangarf">{imgError}</p>}
+
+          {state.bgImage && (
+            <div className="flex items-center gap-3">
+              <img
+                src={state.bgImage}
+                alt=""
+                className="h-14 w-14 shrink-0 rounded-lg object-cover ring-1 ring-line/60 dark:ring-night-line"
+              />
+              <div className="min-w-0 flex-1">
+                <Slider
+                  label="شفافیت تصویر"
+                  value={state.bgOpacity}
+                  onChange={(bgOpacity) => patch({ bgOpacity })}
+                  min={5}
+                  max={100}
+                  step={5}
+                  format={(v) => `${toFa(v)}٪`}
+                />
+              </div>
+            </div>
+          )}
+
+          <p className="text-[10.5px] leading-relaxed text-ink-2/70 dark:text-night-ink-2">
+            تصویر فقط در همین مرورگر می‌ماند و در پیوند هم‌رسانی جا نمی‌گیرد. برای خوانایی، دانه و
+            سایهٔ کاغذ روی تصویر هم می‌نشینند.
+          </p>
+        </div>
+
+        </>
+      ),
+    },
+    {
+      id: 'texture',
+      dock: 'بافت',
+      title: 'بافت کاغذ',
+      icon: <ScrollIcon />,
+      hint: 'اثر روی خروجی',
+      content: (
+        <>
+        <div className="flex flex-col gap-3.5">
+          <Slider
+            label="دانه‌ی کاغذ"
+            value={state.grain}
+            onChange={(grain) => patch({ grain })}
+            min={0}
+            max={200}
+            step={5}
+            format={(v) => `${toFa(v)}٪`}
+          />
+          <Slider
+            label="سایه‌ی لبه‌ها"
+            value={state.vignette}
+            onChange={(vignette) => patch({ vignette })}
+            min={0}
+            max={100}
+            step={5}
+            format={(v) => `${toFa(v)}٪`}
+          />
+          <Slider
+            label="لکه‌های کهنگی"
+            value={state.foxing}
+            onChange={(foxing) => patch({ foxing })}
+            min={0}
+            max={100}
+            step={5}
+            format={(v) => `${toFa(v)}٪`}
+          />
+          <Slider
+            label="رگه‌های الیاف"
+            value={state.fibers}
+            onChange={(fibers) => patch({ fibers })}
+            min={0}
+            max={100}
+            step={5}
+            format={(v) => `${toFa(v)}٪`}
+          />
+          <Toggle label="تای میانی" checked={state.crease} onChange={(crease) => patch({ crease })} />
+        </div>
+        </>
+      ),
+    },
+    {
+      id: 'size',
+      dock: 'اندازه',
+      title: 'اندازه خروجی',
+      icon: <ColumnIcon />,
+      hint: <Dim w={fmt.w} h={fmt.h} />,
+      content: (
+        <>
 
         <div className="flex flex-col gap-4">
           <FormatPicker value={state.formatId} onChange={(formatId) => patch({ formatId })} />
@@ -166,6 +347,7 @@ export default function Controls({
 
               </>
             }
+            as="div"
           >
             <Chips
               options={SCALES.map((s) => ({ id: s.id as number, label: s.label }))}
@@ -177,11 +359,18 @@ export default function Controls({
 
         </div>
 
-      </Section>
-
-      <Section title="چیدمان" delay={160}>
+        </>
+      ),
+    },
+    {
+      id: 'layout',
+      dock: 'چیدمان',
+      title: 'چیدمان',
+      icon: <KongrehIcon />,
+      content: (
+        <>
         <div className="flex flex-col gap-3">
-          <Field label="نوع شعر">
+          <Field label="نوع شعر" as="div">
             <Chips
               options={(Object.keys(LAYOUT_LABELS) as Layout[]).map((l) => ({
                 id: l,
@@ -193,21 +382,12 @@ export default function Controls({
 
           </Field>
 
-          <Field label="تزئین">
-            <Chips
-              columns={3}
-              options={(Object.keys(ORNAMENT_LABELS) as Ornament[]).map((o) => ({
-                id: o,
-                label: ORNAMENT_LABELS[o],
-              }))}
-              value={state.ornament}
-              onChange={(ornament) => patch({ ornament })}
-            />
-
+          <Field label={`تزئین — ${ORNAMENT_LABELS[state.ornament] ?? ''}`} as="div">
+            <OrnamentPicker value={state.ornament} onChange={(ornament) => patch({ ornament })} />
           </Field>
 
           {state.layout !== 'beit' && (
-            <Field label="تراز">
+            <Field label="تراز" as="div">
               <Chips
                 options={[
                   { id: 'center' as const, label: 'وسط' },
@@ -223,9 +403,16 @@ export default function Controls({
           )}
         </div>
 
-      </Section>
-
-      <Section title="حروف‌چینی" delay={200}>
+        </>
+      ),
+    },
+    {
+      id: 'type',
+      dock: 'حروف',
+      title: 'حروف‌چینی',
+      icon: <CuneiformIcon />,
+      content: (
+        <>
         <div className="flex flex-col gap-3.5">
           <div>
             <Slider
@@ -317,9 +504,9 @@ export default function Controls({
           )}
         </div>
 
-      </Section>
-
-    </div>
-
-  )
+        </>
+      ),
+    },
+  ]
+  return sections
 }
