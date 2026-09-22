@@ -4,7 +4,15 @@ import { THEME_BY_ID } from '../lib/themes'
 import { fontStack, FONT_BY_ID } from '../lib/fonts'
 import { pairBeits, parseStanzas, toFa, type PoemState } from '../lib/poem'
 import { BeitMark, Corner, Divider, Shamse } from './Ornaments'
+import { DECOR_BY_ID, decorUrl, type Decor } from '../lib/decor'
 import { BRAND } from '../lib/brand'
+
+const FOX_SPOTS: [number, number, number, number][] = [
+  [8, 12, 9, 0.16], [91, 7, 7, 0.12], [15, 88, 11, 0.18], [86, 82, 8, 0.14],
+  [50, 4, 6, 0.1], [4, 50, 7, 0.12], [96, 45, 6, 0.1], [62, 94, 9, 0.13],
+  [28, 30, 5, 0.08], [72, 22, 4, 0.07], [40, 70, 6, 0.09], [78, 60, 5, 0.08],
+  [22, 58, 4, 0.06], [58, 42, 3, 0.05],
+]
 
 const PoemPage = forwardRef<HTMLDivElement, { state: PoemState }>(function PoemPage(
   { state },
@@ -24,6 +32,48 @@ const PoemPage = forwardRef<HTMLDivElement, { state: PoemState }>(function PoemP
   const num = (n: number) => (state.persianDigits ? toFa(n) : String(n))
 
   const wide = format.w / format.h > 1.2
+  const decor = DECOR_BY_ID.get(state.ornament)
+
+  const decorNode = (d: Decor, width: number) => {
+    const height = (width * d.h) / d.w
+    const url = decorUrl(d)
+    if (d.kind === 'color') {
+      return (
+        <img
+          src={url}
+          alt=""
+          draggable={false}
+          style={{ width, height, display: 'block', opacity: d.opacity ?? 1 }}
+        />
+      )
+    }
+    const mask = `url(${url}) center / contain no-repeat`
+    return (
+      <div
+        aria-hidden
+        style={{
+          width,
+          height,
+          backgroundColor: theme.ink,
+          opacity: d.opacity ?? 1,
+          WebkitMaskImage: `url(${url})`,
+          WebkitMaskSize: 'contain',
+          WebkitMaskRepeat: 'no-repeat',
+          WebkitMaskPosition: 'center',
+          mask,
+        }}
+      />
+    )
+  }
+
+  const tint = theme.dark ? '255,220,160' : '110,70,25'
+  const foxSpots = FOX_SPOTS.map(
+    ([x, y, r, a]) => `radial-gradient(circle at ${x}% ${y}%, rgba(${tint},${a}) 0, rgba(${tint},${a * 0.5}) ${r * 0.5}%, transparent ${r}%)`,
+  ).join(', ')
+  const fiberLine = theme.dark ? 'rgba(255,240,210,.09)' : 'rgba(90,60,30,.10)'
+  const fibersImage = `repeating-linear-gradient(94deg, transparent 0 ${px(11)}px, ${fiberLine} ${px(11)}px ${px(12)}px), repeating-linear-gradient(-86deg, transparent 0 ${px(23)}px, ${fiberLine} ${px(23)}px ${px(24)}px)`
+  const creaseShadow = theme.dark ? 'rgba(0,0,0,.42)' : 'rgba(80,50,20,.16)'
+  const creaseLight = theme.dark ? 'rgba(255,240,210,.06)' : 'rgba(255,255,255,.5)'
 
   const verseStyle: React.CSSProperties = {
     fontFamily: fontStack(state.fontId),
@@ -49,13 +99,32 @@ const PoemPage = forwardRef<HTMLDivElement, { state: PoemState }>(function PoemP
         fontFamily: fontStack(state.fontId),
       }}
     >
-      {theme.grain && (
+      {state.bgImage && (
+        <img
+          src={state.bgImage}
+          alt=""
+          draggable={false}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            opacity: state.bgOpacity / 100,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+      {theme.grain && state.grain > 0 && (
         <div
           style={{
             position: 'absolute',
             inset: 0,
             backgroundImage: theme.grain,
             backgroundSize: `${px(260)}px ${px(260)}px`,
+            opacity: state.grain / 100,
             pointerEvents: 'none',
           }}
         />
@@ -67,11 +136,47 @@ const PoemPage = forwardRef<HTMLDivElement, { state: PoemState }>(function PoemP
           position: 'absolute',
           inset: 0,
           background: theme.dark
-            ? `radial-gradient(120% 85% at 50% 40%, transparent 45%, rgba(0,0,0,.45) 100%)`
-            : `radial-gradient(120% 85% at 50% 40%, transparent 50%, rgba(90,60,30,.11) 100%)`,
+            ? `radial-gradient(120% 85% at 50% 40%, transparent 45%, rgba(0,0,0,.75) 100%)`
+            : `radial-gradient(120% 85% at 50% 40%, transparent 50%, rgba(90,60,30,.19) 100%)`,
+          opacity: state.vignette / 100,
           pointerEvents: 'none',
         }}
       />
+
+      {state.fibers > 0 && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: fibersImage,
+            opacity: (state.fibers / 100) * 0.6,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+      {state.foxing > 0 && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: foxSpots,
+            opacity: state.foxing / 100,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
+
+      {state.crease && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: `linear-gradient(90deg, transparent 0 calc(50% - ${px(14)}px), ${creaseShadow} 50%, ${creaseLight} calc(50% + ${px(1.5)}px), transparent calc(50% + ${px(14)}px) 100%)`,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
 
       {state.ornament === 'frame' && (
         <>
@@ -139,6 +244,12 @@ const PoemPage = forwardRef<HTMLDivElement, { state: PoemState }>(function PoemP
 
           </div>
 
+        )}
+
+        {decor?.place === 'crown' && (
+          <div style={{ marginBottom: px(16), display: 'flex', justifyContent: 'center' }}>
+            {decorNode(decor, px(decor.width))}
+          </div>
         )}
 
         {(state.title || state.poet) && (
@@ -269,6 +380,19 @@ const PoemPage = forwardRef<HTMLDivElement, { state: PoemState }>(function PoemP
 
         )}
       </div>
+
+      {decor?.place === 'corner' && (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: pad * 0.38,
+            left: pad * 0.42,
+            pointerEvents: 'none',
+          }}
+        >
+          {decorNode(decor, px(decor.width))}
+        </div>
+      )}
 
       {state.watermark && (
         <div

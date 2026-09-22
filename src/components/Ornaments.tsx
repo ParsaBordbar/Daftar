@@ -66,3 +66,4 @@ export function BeitMark({ color, size = 14 }: { color: string; size?: number })
 
   )
 }
+
