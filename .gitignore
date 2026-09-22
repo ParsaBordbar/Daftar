@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# build outputs
+__pycache__/
+ads/*/renders/
