@@ -101,13 +101,6 @@ export const fetchCategory = (fullUrl: string) =>
 
 export const fetchPoem = (fullUrl: string) => getJson<Poem>(`/poets${fullUrl}.json`)
 
-/**
- * Full-text search. The browsable tree comes from the ganjoor-data snapshot on
- * jsDelivr, but that snapshot has no index — searching it client-side would mean
- * downloading ~132k poems. So the query (and only the query) goes to Ganjoor's
- * public API; the poem itself is still read from the CDN afterwards, because a
- * hit's `fullUrl` is the same path the snapshot uses.
- */
 export const GANJOOR_API = 'https://api.ganjoor.net'
 
 export interface SearchHit {
@@ -145,7 +138,6 @@ export async function searchPoems(
   if (!res.ok) throw new Error(`گنجور ${res.status}`)
   const hits = (await res.json()) as SearchHit[]
 
-  // Totals ride along in a custom header the API explicitly exposes to CORS.
   let total = hits.length
   let hasMore = hits.length === SEARCH_PAGE_SIZE
   try {
@@ -163,7 +155,6 @@ export async function searchPoems(
   return out
 }
 
-/** "حافظ » غزلیات » غزل ۱" -> poet, the middle path, and the leaf title. */
 export function splitFullTitle(fullTitle: string | undefined) {
   const parts = (fullTitle ?? '').split('»').map((s) => s.trim()).filter(Boolean)
   return {
@@ -210,3 +201,59 @@ export const coupletsToText = (couplets: Couplet[]) =>
 
 export const looksLikeVerse = (couplets: Couplet[]) =>
   couplets.some((c) => c.lines.length === 2)
+
+export interface RandomPick {
+  poet: PoetRef
+
+  trail: { title: string; fullUrl: string }[]
+  cat: Category
+  poem: Poem
+}
+
+const FAMOUS = [
+  '/hafez', '/saadi', '/moulavi', '/ferdousi', '/khayyam', '/nezami', '/attar',
+  '/babataher', '/roodaki', '/parvin', '/shahriar', '/iraj', '/bahar',
+  '/sanaee', '/naserkhosro', '/vahshi', '/jami', '/saeb',
+]
+
+const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)]
+
+export async function randomPoem(): Promise<RandomPick> {
+  const m = await fetchManifest()
+  const famous = m.Poets.filter((p) => FAMOUS.includes(p.FullUrl))
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const poet = famous.length && Math.random() < 0.65 ? pick(famous) : pick(m.Poets)
+    const trail = [{ title: poet.Nickname, fullUrl: poet.FullUrl }]
+    let cat: Category
+    try {
+      cat = await fetchCategory(poet.FullUrl)
+    } catch {
+      continue
+    }
+
+    for (let depth = 0; depth < 8; depth++) {
+      if (cat.ChildCats.length && (!cat.Poems.length || Math.random() < 0.85)) {
+        const ref = pick(cat.ChildCats)
+        try {
+          cat = await fetchCategory(ref.FullUrl)
+        } catch {
+          break
+        }
+        trail.push({ title: ref.Title, fullUrl: ref.FullUrl })
+        continue
+      }
+      if (!cat.Poems.length) break
+      try {
+        const poem = await fetchPoem(pick(cat.Poems).FullUrl)
+        if (toCouplets(poem).length) return { poet, trail, cat, poem }
+      } catch {
+      }
+      break
+    }
+  }
+  throw new Error('no random poem')
+}
+
+export const trailSource = (pick: RandomPick) =>
+  pick.trail.slice(1).map((t) => t.title).join(' » ') || pick.cat.BookName || ''
