@@ -1,5 +1,6 @@
 import { toPng, toBlob } from 'html-to-image'
 import { embeddedFontCss } from './fonts'
+import { makeZip } from './zip'
 
 export interface ExportOptions {
   scale: number
@@ -65,4 +66,43 @@ export async function copyPng(node: HTMLElement, opts: ExportOptions) {
   const blob = await capture(node, opts, (n, cfg) => toBlob(n, cfg))
   if (!blob) throw new Error('render produced no image')
   await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+}
+
+export async function renderPng(node: HTMLElement, opts: ExportOptions): Promise<Blob> {
+  const blob = await capture(node, opts, (n, cfg) => toBlob(n, cfg))
+  if (!blob) throw new Error('render produced no image')
+  return blob
+}
+
+export function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 10_000)
+}
+
+export const pageFilename = (base: string, index: number, total: number) =>
+  `${base}-${String(index + 1).padStart(String(total).length, '0')}.png`
+
+export async function bundleZip(pages: Blob[], base: string): Promise<Blob> {
+  const entries = await Promise.all(
+    pages.map(async (blob, i) => ({
+      name: pageFilename(base, i, pages.length),
+      data: new Uint8Array(await blob.arrayBuffer()),
+    })),
+  )
+  return makeZip(entries)
+}
+
+export async function shareBundle(pages: Blob[], base: string, text: string) {
+  const files = pages.map(
+    (blob, i) => new File([blob], pageFilename(base, i, pages.length), { type: 'image/png' }),
+  )
+  if (navigator.canShare?.({ files })) {
+    await navigator.share({ files, text })
+    return true
+  }
+  return false
 }
