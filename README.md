@@ -4,7 +4,7 @@
 
 **A Persian poem page maker that runs entirely in your browser.**
 
-[**▶ Open the app**](https://parsabordbar.github.io/Daftar/) · [Report a bug](https://github.com/ParsaBordbar/Daftar/issues) · [فارسی](FA-README.md)
+[**▶ Open the app**](https://daftare-man.ir/) · [Report a bug](https://github.com/ParsaBordbar/Daftar/issues) · [فارسی](FA-README.md)
 
 [![Deploy](https://github.com/ParsaBordbar/Daftar/actions/workflows/deploy.yml/badge.svg)](https://github.com/ParsaBordbar/Daftar/actions/workflows/deploy.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -35,7 +35,7 @@ typeface and a paper, and export a finished book page as a high-resolution PNG s
 There is no server, no account, and no build step between you and the image. The whole app is a static bundle on
 GitHub Pages.
 
-> **Try it now → <https://parsabordbar.github.io/Daftar/>**
+> **Try it now → <https://daftare-man.ir/>**
 
 ## Feature tour
 
@@ -79,6 +79,30 @@ free verse (شعر نو). Manuscript ornaments: divider, double frame, corner pi
 The A4 and A5 presets are 150 dpi at 1×, so export them at **2× for a true 300 dpi print file**
 (2480 × 3508 and 1748 × 2480).
 
+### Surprise me
+
+The dice button (شانسی) drops a random Ganjoor poem onto the page — weighted toward the well-known poets so most
+draws land on Hafez, Saadi, Rumi, Ferdowsi and friends, with the long tail of ~234 poets for the rest. The same
+button inside the browser opens the poem there so you can pick the beits first.
+
+### Your own picture behind the paper
+
+Upload, drag-drop or paste (Ctrl+V) an image and it sits under the paper with an opacity slider; grain, vignette
+and the other paper effects still render on top. The image is downscaled to 2600 px on the long edge and kept in
+this browser only — it never goes into a share link.
+
+### Undo, redo, keyboard
+
+Every change is undoable (Ctrl+Z, Shift for redo; Cmd works too on a Mac); bursts of typing or a slider drag collapse into one step.
+Shortcuts for export, copy, Ganjoor, new / duplicate page and page navigation are listed under «کلیدهای میانبر»
+in the actions panel. Letters go by physical key, so a Persian layout works too.
+
+### Works offline
+
+A service worker precaches the app shell, bundled fonts and decor art on the first visit. Google-hosted faces and
+Ganjoor poems are cached as you use them, so a face or poem you have opened once stays available without a
+connection.
+
 ### Share links that carry the whole page
 
 The full page state is LZ-compressed into the URL fragment. Nothing is stored anywhere — the recipient opens the
@@ -90,6 +114,7 @@ link and gets your exact page, still editable.
 | --- | --- |
 | Your poem text, title, layout, and the exported PNG | **No.** Rendered and encoded locally; export never uploads. |
 | Share links | **No.** The state lives in the URL fragment, which browsers never send to a server. |
+| Background image | **No.** Stored in this browser's `localStorage` only, and left out of share links. |
 | Browsing / reading Ganjoor poems | Yes — plain file reads from the `ganjoor-data` snapshot on jsDelivr. |
 | Ganjoor full-text search | Yes — your search term is sent to Ganjoor's public API (`api.ganjoor.net`). |
 | Page counter | A bare increment to a public counter service. No content, no identifiers. |
@@ -114,8 +139,19 @@ npm run dev
 ## Deploy
 
 Pushing to `main` runs [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which builds with
-`VITE_BASE=/<repo-name>/`, copies `index.html` to `404.html` so deep links survive, and publishes to Pages.
-Enable it once under **Settings → Pages → Source: GitHub Actions**.
+`VITE_BASE=/` for the custom domain, copies `index.html` to `404.html` so deep links survive, and publishes to
+Pages. Enable it once under **Settings → Pages → Source: GitHub Actions**, and set the custom domain there to
+`daftare-man.ir`. `public/CNAME` keeps that setting from being reset on the next deploy.
+
+DNS for the domain, at whoever hosts its records:
+
+| Type | Host | Value |
+| --- | --- | --- |
+| A | `@` | `185.199.108.153` |
+| A | `@` | `185.199.109.153` |
+| A | `@` | `185.199.110.153` |
+| A | `@` | `185.199.111.153` |
+| CNAME | `www` | `parsabordbar.github.io` |
 
 To publish from your machine instead, set `VITE_BASE` explicitly — the default in `vite.config.ts` is
 lowercase `/daftar/` and GitHub Pages paths are case-sensitive:
