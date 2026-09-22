@@ -1,6 +1,7 @@
 import { DEFAULT_FONT, FONT_BY_ID } from './fonts'
 import { DEFAULT_THEME } from './themes'
 import { DEFAULT_FORMAT, FORMAT_BY_ID } from './formats'
+import { DECOR } from './decor'
 
 export type Layout =
 
@@ -10,7 +11,9 @@ export type Layout =
 
   | 'free'
 
-export type Ornament = 'none' | 'rule' | 'frame' | 'corners' | 'shamse'
+export type BaseOrnament = 'none' | 'rule' | 'frame' | 'corners' | 'shamse'
+
+export type Ornament = BaseOrnament | (string & {})
 
 export interface PoemState {
   text: string
@@ -36,6 +39,16 @@ export interface PoemState {
   padding: number
 
   watermark: boolean
+
+  grain: number
+  vignette: number
+  foxing: number
+  fibers: number
+  crease: boolean
+
+  bgImage: string
+
+  bgOpacity: number
 }
 
 export const SAMPLE = `بشنو این نی چون شکایت می‌کند
@@ -67,6 +80,13 @@ export const INITIAL: PoemState = {
   align: 'center',
   padding: 110,
   watermark: true,
+  grain: 100,
+  vignette: 60,
+  foxing: 0,
+  fibers: 0,
+  crease: false,
+  bgImage: '',
+  bgOpacity: 100,
 }
 
 export const LAYOUT_LABELS: Record<Layout, string> = {
@@ -75,12 +95,13 @@ export const LAYOUT_LABELS: Record<Layout, string> = {
   free: 'شعر نو',
 }
 
-export const ORNAMENT_LABELS: Record<Ornament, string> = {
+export const ORNAMENT_LABELS: Record<string, string> = {
   none: 'بدون تزئین',
   rule: 'خط جدا‌کننده',
   frame: 'کادر',
   corners: 'گوشه‌ها',
   shamse: 'شمسه',
+  ...Object.fromEntries(DECOR.map((d) => [d.id, d.label])),
 }
 
 const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹'
