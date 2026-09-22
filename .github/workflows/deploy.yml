@@ -29,10 +29,9 @@ jobs:
         with:
           enablement: true
       - run: npm ci
-      # base must match the repo name so asset URLs resolve under /<repo>/.
       - run: npm run build
         env:
-          VITE_BASE: /${{ github.event.repository.name }}/
+          VITE_BASE: /
       # SPA fallback: a deep link like /?#p=... still lands on index.html.
       - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3
