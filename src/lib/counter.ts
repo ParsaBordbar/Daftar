@@ -19,8 +19,8 @@ const TIMEOUT = 4000
 
 const localCount = () => Number(localStorage.getItem(LOCAL_KEY) ?? 0)
 
-const bumpLocal = () => {
-  const n = localCount() + 1
+const bumpLocal = (by: number) => {
+  const n = localCount() + by
   localStorage.setItem(LOCAL_KEY, String(n))
   return n
 }
@@ -46,7 +46,10 @@ export const readCounter = async (): Promise<CounterState> => ({
   local: localCount(),
 })
 
-export const bumpCounter = async (): Promise<CounterState> => {
-  const local = bumpLocal()
-  return { global: await hit(COUNTER.up), local }
+export const bumpCounter = async (pages = 1): Promise<CounterState> => {
+  const n = Math.max(1, Math.floor(pages))
+  const local = bumpLocal(n)
+  const results = await Promise.all(Array.from({ length: n }, () => hit(COUNTER.up)))
+  const seen = results.filter((v): v is number => v !== null)
+  return { global: seen.length ? Math.max(...seen) : null, local }
 }
