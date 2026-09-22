@@ -4,20 +4,20 @@
   --font-ui: 'Vazirmatn', Tahoma, system-ui, sans-serif;
   --font-mark: 'Playfair Display', Georgia, serif;
 
-  --color-paper: #f9f5ef;
-  --color-paper-2: #f2ece4;
-  --color-ink: #2e1f14;
-  --color-ink-2: #7d6449;
-  --color-tan: #b07d62;
-  --color-gold: #c8a24a;
-  --color-shangarf: #b33a2b;
-  --color-line: #ddd0bb;
+  --color-paper: #ffffff;
+  --color-paper-2: #f7f7f5;
+  --color-ink: #37352f;
+  --color-ink-2: #787774;
+  --color-tan: #9f6b53;
+  --color-gold: #cb912f;
+  --color-shangarf: #d44c47;
+  --color-line: #e3e2e0;
 
-  --color-night: #171a22;
-  --color-night-2: #1e222c;
-  --color-night-ink: #ece5d8;
-  --color-night-ink-2: #97907f;
-  --color-night-line: #2e3340;
+  --color-night: #191919;
+  --color-night-2: #202020;
+  --color-night-ink: #d4d4d4;
+  --color-night-ink-2: #9b9b9b;
+  --color-night-line: #373737;
 
   --ease-page: cubic-bezier(0.32, 0.72, 0, 1);
 }
@@ -39,6 +39,7 @@ body {
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+  overflow-x: clip;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -50,20 +51,16 @@ body {
 
 @utility jadval {
   border: 1px solid var(--jadval-edge);
-  box-shadow:
-    inset 0 0 0 3px color-mix(in oklab, var(--color-gold) 12%, transparent),
-    inset 0 0 0 4px var(--jadval-inner);
+  box-shadow: 0 1px 2px rgba(15, 15, 15, 0.04);
 }
 
 :root {
-  --jadval-edge: color-mix(in oklab, #ddd0bb 80%, transparent);
-  --jadval-inner: color-mix(in oklab, #ddd0bb 45%, transparent);
+  --jadval-edge: var(--color-line);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --jadval-edge: #2e3340;
-    --jadval-inner: color-mix(in oklab, #2e3340 70%, transparent);
+    --jadval-edge: var(--color-night-line);
   }
 }
 
@@ -104,10 +101,6 @@ input[type='range'] {
     transition-duration: 0.01ms !important;
   }
 }
-
-/* ---------- motion ----------
-   Chrome only. PoemPage is the html-to-image capture node and stays static,
-   so an export can never catch a frame mid-animation. */
 
 @keyframes daftar-rise {
   from {
@@ -180,8 +173,6 @@ input[type='range'] {
   animation: daftar-breathe 1.4s ease-in-out infinite;
 }
 
-/* prefers-reduced-motion is neutralised globally above; also drop the offsets
-   so nothing lands translated when animations are clamped to 0.01ms. */
 @media (prefers-reduced-motion: reduce) {
   @keyframes daftar-rise {
     from {
@@ -200,5 +191,116 @@ input[type='range'] {
       opacity: 1;
       transform: none;
     }
+  }
+}
+
+kbd {
+  display: inline-block;
+  min-width: 1.5em;
+  padding: 0.05em 0.4em;
+  border: 1px solid var(--jadval-edge);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  font: 500 10.5px/1.5 ui-monospace, Menlo, monospace;
+  text-align: center;
+  direction: ltr;
+  color: var(--color-ink-2);
+}
+@media (prefers-color-scheme: dark) {
+  kbd {
+    color: var(--color-night-ink-2);
+  }
+}
+
+.tip {
+  position: relative;
+}
+.tip::after {
+  content: attr(data-tip);
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translate(-50%, 4px);
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 40;
+}
+.tip-below::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+  --tip-from: translate(-50%, -4px);
+}
+.tip:hover::after,
+.tip:focus-visible::after {
+  display: block;
+  animation: daftar-tip 150ms ease 120ms both;
+}
+@keyframes daftar-tip {
+  from {
+    opacity: 0;
+    transform: var(--tip-from, translate(-50%, 4px));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .tip::after {
+    background: var(--color-night-ink);
+    color: var(--color-night);
+  }
+}
+@media (hover: none) {
+  .tip::after {
+    display: none;
+  }
+}
+
+.keycast kbd {
+  color: inherit;
+  border-color: color-mix(in oklab, currentColor 35%, transparent);
+  font-size: 12px;
+  padding: 0.1em 0.5em;
+}
+
+.keycast {
+  animation: daftar-keycast 0.26s var(--ease-page) both;
+}
+@keyframes daftar-keycast {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+}
+
+.sheet-backdrop {
+  animation: daftar-fade-in 0.25s ease both;
+}
+.sheet-panel {
+  animation: daftar-sheet-up 0.36s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes daftar-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes daftar-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet-panel,
+  .sheet-backdrop,
+  .keycast {
+    animation-duration: 1ms;
   }
 }

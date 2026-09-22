@@ -1,51 +1,109 @@
 import type { ReactNode } from 'react'
 
-const panel = 'anim-rise jadval rounded-2xl bg-white/45 dark:bg-night-2/70'
+const panel = 'anim-rise jadval rounded-2xl bg-paper dark:bg-night-2'
 
 export function Section({
   title,
   hint,
+  icon,
   delay = 0,
+  open = true,
+  onToggle,
   children,
 }: {
   title: string
   hint?: ReactNode
-  /** ms of entrance stagger — panels cascade down the sidebar. */
+
+  icon?: ReactNode
+
   delay?: number
+
+  open?: boolean
+  onToggle?: () => void
   children: ReactNode
 }) {
-  return (
-    <section
-      className={`${panel} p-4`}
-      style={{ '--anim-delay': `${delay}ms` } as React.CSSProperties}
-    >
-      <div className="mb-3 flex items-baseline justify-between gap-2">
-        <h2 className="flex items-baseline gap-2 text-[13px] font-medium tracking-wide text-ink dark:text-night-ink">
+  const collapsible = !!onToggle
+  const head = (
+    <>
+      <h2 className="flex items-center gap-2 text-[13px] font-medium tracking-wide text-ink dark:text-night-ink">
+        {icon ? (
+          <span className="[--icon-line:#513423] dark:[--icon-line:#e0c98a]" aria-hidden>
+            {icon}
+          </span>
+        ) : (
           <span className="h-[7px] w-[7px] rotate-45 rounded-[1px] bg-gold/70" aria-hidden />
-          {title}
-        </h2>
+        )}
+        {title}
+      </h2>
 
+      <span className="flex items-center gap-2">
         {hint && (
           <span className="text-[11px] tabular-nums text-ink-2/70 dark:text-night-ink-2">
             {hint}
           </span>
-
         )}
-      </div>
+        {collapsible && (
+          <svg
+            viewBox="0 0 16 16"
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+            className={`text-ink-2/70 transition-transform duration-200 ease-page dark:text-night-ink-2 ${
+              open ? '' : '-rotate-90'
+            }`}
+          >
+            <path d="m4 6 4 4 4-4" />
+          </svg>
+        )}
+      </span>
+    </>
+  )
+  return (
+    <section
+      className={`${panel} ${open ? 'p-4' : 'px-4 py-3'}`}
+      style={{ '--anim-delay': `${delay}ms` } as React.CSSProperties}
+    >
+      {collapsible ? (
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          className={`-mx-1 flex w-[calc(100%+0.5rem)] items-center justify-between gap-2 rounded-lg px-1 text-start transition-colors hover:bg-tan/5 ${
+            open ? 'mb-3' : ''
+          }`}
+        >
+          {head}
+        </button>
+      ) : (
+        <div className="mb-3 flex items-center justify-between gap-2">{head}</div>
+      )}
 
-      {children}
+      {open && children}
     </section>
 
   )
 }
 
-export function Field({ label, children }: { label: ReactNode; children: ReactNode }) {
+export function Field({
+  label,
+  as: Tag = 'label',
+  children,
+}: {
+  label: ReactNode
+  as?: 'label' | 'div'
+  children: ReactNode
+}) {
   return (
-    <label className="block">
+    <Tag className="block">
       <span className="mb-1.5 block text-[11px] text-ink-2 dark:text-night-ink-2">{label}</span>
 
       {children}
-    </label>
+    </Tag>
 
   )
 }

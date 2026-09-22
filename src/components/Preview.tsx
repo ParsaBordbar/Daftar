@@ -32,7 +32,7 @@ export default function Preview({
     <div ref={boxRef} className="flex h-full w-full items-center justify-center p-4 md:p-8">
       <div
         style={{ width: format.w * scale, height: format.h * scale }}
-        className="anim-pop relative shrink-0 rounded-[3px] shadow-[0_18px_50px_-12px_rgba(60,40,20,0.35)] ring-1 ring-black/10 transition-[width,height] duration-300 ease-page"
+        className="anim-pop relative shrink-0 rounded-[3px] shadow-[0_18px_50px_-12px_rgba(15,15,15,0.28)] ring-1 ring-black/10 transition-[width,height] duration-300 ease-page"
       >
         <div
           style={{

@@ -1,3 +1,5 @@
+/// <reference types="vite-plugin-pwa/client" />
+
 interface ImportMetaEnv {
   readonly VITE_COUNTER_NS?: string
   readonly VITE_COUNTER_KEY?: string

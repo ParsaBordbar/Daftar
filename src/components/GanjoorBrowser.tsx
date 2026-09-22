@@ -5,6 +5,7 @@ import {
   fetchManifest,
   fetchPoem,
   looksLikeVerse,
+  randomPoem,
   searchPoems,
   SEARCH_PAGE_SIZE,
   splitFullTitle,
@@ -18,6 +19,7 @@ import {
 } from '../lib/ganjoor'
 import { toFa, type Layout } from '../lib/poem'
 import { Button, TextInput } from './ui'
+import { BackIcon, DiceIcon } from './Icons'
 
 export interface Insertion {
   text: string
@@ -35,10 +37,9 @@ interface Crumb {
 const DEFAULT_COUPLETS = 4
 const MIN_QUERY = 2
 const SEARCH_DEBOUNCE = 350
-/** Cap the entrance cascade so a long result list still finishes quickly. */
+
 const stagger = (i: number) => ({ '--anim-delay': `${Math.min(i, 10) * 30}ms` }) as React.CSSProperties
 
-/** Two lines around the first match, so a hit shows why it matched. */
 function snippet(text: string, term: string) {
   const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)
   const at = lines.findIndex((l) => l.includes(term))
@@ -83,7 +84,7 @@ export default function GanjoorBrowser({
   const [hitMore, setHitMore] = useState(false)
   const [hitPage, setHitPage] = useState(1)
   const [searching, setSearching] = useState(false)
-  /** Set when the open poem was reached through search, not the category tree. */
+
   const [fromSearch, setFromSearch] = useState(false)
   const [hitTerm, setHitTerm] = useState('')
 
@@ -134,7 +135,6 @@ export default function GanjoorBrowser({
     }
   }, [])
 
-  // Debounced full-text search, scoped to the current poet when inside one.
   useEffect(() => {
     const term = q.trim()
     if (poem) return
@@ -228,6 +228,54 @@ export default function GanjoorBrowser({
     setError(null)
   }
 
+  const back = useMemo(() => {
+    if (poem) {
+      return () => {
+        setPoem(null)
+        setError(null)
+        if (fromSearch) setFromSearch(false)
+      }
+    }
+    if (poet && trail.length > 1) {
+      const parent = trail[trail.length - 2]
+      return () => openCat(parent, poet, trail.length - 2)
+    }
+    if (poet) return reset
+    return null
+  }, [poem, fromSearch, poet, trail, openCat])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey && e.key === 'ArrowRight' && back) {
+        e.preventDefault()
+        back()
+      }
+    }
+    addEventListener('keydown', onKey)
+    return () => removeEventListener('keydown', onKey)
+  }, [back])
+
+  const surprise = async () => {
+    setBusy(true)
+    setError(null)
+    try {
+      const r = await randomPoem()
+      setPoet(r.poet)
+      setCat(r.cat)
+      setTrail(r.trail)
+      setPoem(r.poem)
+      setFromSearch(false)
+      setHits(null)
+      setQ('')
+      setFrom(0)
+      setCount(DEFAULT_COUPLETS)
+    } catch {
+      setError('شعر تصادفی پیدا نشد. دوباره تلاش کنید.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
   const insert = () => {
     if (!poem) return
     const meta = splitFullTitle(poem.FullTitle)
@@ -242,15 +290,30 @@ export default function GanjoorBrowser({
   }
 
   return (
-    <div className="anim-fade fixed inset-0 z-50 flex items-end justify-center bg-ink/45 p-0 backdrop-blur-sm sm:items-center sm:p-6">
+    <div
+      className="anim-fade fixed inset-0 z-50 flex items-end justify-center bg-ink/30 p-0 sm:items-center sm:p-6"
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-label="انتخاب شعر از گنجور"
-        className="anim-sheet jadval flex max-h-[92dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-3xl bg-paper sm:max-h-[86dvh] sm:rounded-3xl dark:bg-night-2"
+        className="anim-sheet jadval flex h-[94dvh] w-full max-w-3xl flex-col overflow-hidden rounded-t-2xl bg-paper shadow-[0_24px_80px_-20px_rgba(46,31,20,0.45)] sm:h-[min(86dvh,760px)] sm:rounded-2xl dark:bg-night-2 dark:shadow-[0_24px_80px_-20px_rgba(0,0,0,0.7)]"
       >
         <header className="flex shrink-0 items-center justify-between gap-3 border-b border-line/50 px-4 py-3 dark:border-night-line">
-          <div className="min-w-0">
+          <div className="flex min-w-0 items-center gap-2">
+            {back && (
+              <button
+                type="button"
+                onClick={back}
+                title="بازگشت (Alt+→)"
+                aria-label="بازگشت"
+                className="anim-fade inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-line/70 text-ink transition-[background-color,border-color,transform] duration-200 ease-page hover:-translate-y-px hover:border-tan hover:bg-tan/10 active:translate-y-0 active:scale-[0.96] dark:border-night-line dark:text-night-ink"
+              >
+                <BackIcon size={18} className="[--icon-line:#513423] dark:[--icon-line:#e0c98a]" />
+              </button>
+            )}
+            <div className="min-w-0">
             <h2 className="text-[15px] font-medium">گنجور</h2>
 
             <p className="truncate text-[11px] text-ink-2 dark:text-night-ink-2">
@@ -259,15 +322,28 @@ export default function GanjoorBrowser({
                 : 'در حال بارگیری…'}
             </p>
 
+            </div>
           </div>
 
-          <Button onClick={onClose}>بستن</Button>
+          <div className="flex shrink-0 items-center gap-2">
+            <Button onClick={surprise} disabled={busy} title="یک شعر تصادفی باز کن">
+              <DiceIcon className="[--icon-line:#513423] dark:[--icon-line:#e0c98a]" />
+              <span className="hidden sm:inline">شانسی</span>
+            </Button>
+            <Button onClick={onClose}>بستن</Button>
+          </div>
 
         </header>
 
-        {(poet || fromSearch) && (
-          <nav className="anim-fade flex shrink-0 flex-wrap items-center gap-1 border-b border-line/40 px-4 py-2 text-[11.5px] dark:border-night-line">
-            <button onClick={reset} className="text-tan hover:underline">
+        <nav
+          aria-label="مسیر"
+          className="flex h-9 shrink-0 items-center gap-1 overflow-x-auto border-b border-line/40 px-4 text-[11.5px] whitespace-nowrap [scrollbar-width:none] dark:border-night-line [&::-webkit-scrollbar]:hidden"
+        >
+            <button
+              onClick={reset}
+              disabled={!poet && !fromSearch}
+              className="text-tan hover:underline disabled:text-ink-2 disabled:no-underline dark:disabled:text-night-ink-2"
+            >
               همهٔ شاعران
             </button>
 
@@ -314,23 +390,24 @@ export default function GanjoorBrowser({
               </span>
 
             )}
-          </nav>
+        </nav>
 
-        )}
-
-        {!poem && (
-          <div className="shrink-0 px-4 pt-3">
-            <TextInput
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder={
-                poet ? `جست‌وجو در آثار ${poet.Nickname}…` : 'نام شاعر یا مصرعی از شعر…'
-              }
-              aria-label="جست‌وجو"
-            />
-          </div>
-
-        )}
+        <div className="shrink-0 px-4 pt-3">
+          <TextInput
+            value={poem ? '' : q}
+            disabled={!!poem}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder={
+              poem
+                ? poem.FullTitle
+                : poet
+                  ? `جست‌وجو در آثار ${poet.Nickname}…`
+                  : 'نام شاعر یا مصرعی از شعر…'
+            }
+            aria-label="جست‌وجو"
+            className="disabled:opacity-60"
+          />
+        </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto p-4">
           {error && (
@@ -346,9 +423,6 @@ export default function GanjoorBrowser({
 
           {poem && !busy && (
             <div className="flex flex-col gap-4">
-              {fromSearch && (
-                <p className="anim-fade truncate text-[12px] text-tan">{poem.FullTitle}</p>
-              )}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-2 dark:text-night-ink-2">
                 {poem.Metre?.Rhythm && <span>وزن: {poem.Metre.Rhythm}</span>}
 
@@ -400,7 +474,7 @@ export default function GanjoorBrowser({
 
               )}
 
-              <div className="jadval rounded-xl bg-white/50 p-4 text-center leading-[2.4] dark:bg-night/40">
+              <div className="jadval rounded-xl bg-paper-2/70 p-4 text-center leading-[2.4] dark:bg-night/40">
                 {slice.map((c, i) => (
                   <p key={i} className={`text-[13.5px] ${c.prose ? 'text-start' : ''}`}>
                     {c.lines.join(' ⁘ ')}

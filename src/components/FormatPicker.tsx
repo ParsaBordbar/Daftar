@@ -14,7 +14,7 @@ function Swatch({ format, active }: { format: Format; active: boolean }) {
       aria-hidden
     >
       <span
-        className={`block rounded-[2px] border transition-[width,height,background-color,border-color] duration-300 ease-page ${
+        className={`block rounded-xs border transition-[width,height,background-color,border-color] duration-300 ease-page ${
           active
             ? 'border-tan bg-tan/25'
             : 'border-ink-2/40 bg-ink-2/8 group-hover:border-tan/60 dark:border-night-ink-2/50 dark:bg-night-ink-2/10'
