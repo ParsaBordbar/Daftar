@@ -107,6 +107,56 @@ export const THEMES: Theme[] = [
     frame: 'rgba(236,233,228,0.2)',
     dark: true,
   },
+  {
+    id: 'takht-jamshid',
+    label: 'تخت جمشید',
+    bg: 'radial-gradient(120% 95% at 50% 0%, #e9dfcc 0%, #d9cbb1 55%, #c4b090 100%)',
+    grain:
+      'radial-gradient(circle at 20% 26%, rgba(90,66,40,.07) 0 2px, transparent 3px), radial-gradient(circle at 70% 58%, rgba(90,66,40,.06) 0 2px, transparent 3px), radial-gradient(circle at 46% 86%, rgba(90,66,40,.065) 0 2px, transparent 3px)',
+    ink: '#3b2a1a',
+    muted: '#836a4c',
+    accent: '#8a5a2b',
+    gold: '#b8912f',
+    frame: 'rgba(110,78,42,0.34)',
+  },
+  {
+    id: 'shush',
+    label: 'شوش',
+    bg: 'linear-gradient(165deg, #123f6b 0%, #0f4f74 45%, #0b2f52 100%)',
+    grain:
+      'radial-gradient(circle at 24% 28%, rgba(232,185,80,.07) 0 2px, transparent 3px), radial-gradient(circle at 76% 64%, rgba(80,200,190,.06) 0 2px, transparent 3px)',
+    ink: '#f3e7c8',
+    muted: '#8fb9c9',
+    accent: '#e0a83a',
+    gold: '#f0c85c',
+    frame: 'rgba(240,200,92,0.42)',
+    dark: true,
+  },
+  {
+    id: 'arghavan',
+    label: 'ارغوان شاهی',
+    bg: 'linear-gradient(160deg, #3d1a3f 0%, #2c1230 55%, #1b0a1f 100%)',
+    grain:
+      'radial-gradient(circle at 30% 22%, rgba(230,190,110,.06) 0 1.5px, transparent 2.5px), radial-gradient(circle at 70% 74%, rgba(230,190,110,.05) 0 1.5px, transparent 2.5px)',
+    ink: '#f2e4cf',
+    muted: '#b596b3',
+    accent: '#d9a441',
+    gold: '#e8c56a',
+    frame: 'rgba(232,197,106,0.38)',
+    dark: true,
+  },
+  {
+    id: 'zar',
+    label: 'زر هخامنشی',
+    bg: 'linear-gradient(160deg, #f4e4b6 0%, #e6c97e 50%, #cfa650 100%)',
+    grain:
+      'radial-gradient(circle at 18% 24%, rgba(120,80,20,.07) 0 2px, transparent 3px), radial-gradient(circle at 72% 62%, rgba(120,80,20,.06) 0 2px, transparent 3px)',
+    ink: '#4a2e0e',
+    muted: '#8c6a2a',
+    accent: '#8a4a1c',
+    gold: '#a8741a',
+    frame: 'rgba(138,74,28,0.36)',
+  },
 ]
 
 export const THEME_BY_ID = new Map(THEMES.map((t) => [t.id, t]))
