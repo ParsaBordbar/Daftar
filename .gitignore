@@ -25,4 +25,6 @@ dist-ssr
 
 # build outputs
 __pycache__/
-ads/*/renders/
+
+# marketing videos, kept out of the repo
+ads/
