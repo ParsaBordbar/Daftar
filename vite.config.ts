@@ -15,7 +15,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webp,webmanifest}'],
 
-        globIgnores: ['brand/**', 'og-image.png'],
+        globIgnores: ['brand/**', 'og-image.png', 'features/**'],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         runtimeCaching: [
           {
