@@ -16,6 +16,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webp,webmanifest}'],
 
         globIgnores: ['brand/**', 'og-image.png', 'features/**'],
+        navigateFallbackDenylist: [/\/features(\/|$)/],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         runtimeCaching: [
           {
